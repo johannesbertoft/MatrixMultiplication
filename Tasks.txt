@@ -1,0 +1,43 @@
+Notes
+
+# Task 1 - complete
+
+Elementary algorithm. Useful to check the correctness of more complicated algorithms
+
+# Task 2 - Complete
+
+Inplace transposed version, measure runtime of transposing Inplace
+
+# Task 3 - Complete
+
+Elementary algorithm assuming one operand transposed, discuss cache model.
+
+# Task 4 - Complete
+
+Tiled implementation, 3 nested loops and call to Elementary
+
+# Task 5 - Incomplete
+
+Decide on the best parameter s for Tiled. Fix n and discuss choice of n.
+Run experiments on s from 2 to n/2. Discuss results.
+
+# Task 6 - Incomplete
+
+Repeat experiment from task 5 with different n
+
+# Task 7 Complete
+
+# Task 8 Complete
+
+# Task 9 Incomplete
+
+Decide on the best parameter for fall back to elementary algorithm. Fix n to suitable value 
+discuss results
+
+# Task 10 Complete
+
+# Task 11 Incomplete
+
+Decide on best parameter for elementary algorithm, fix n, repeat with different n.
+
+
