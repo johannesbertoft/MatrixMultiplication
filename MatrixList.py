@@ -274,9 +274,10 @@ def elementary_multiplication_in_place(C: Matrix, A: Matrix, B: Matrix) -> None:
     multiplication in place, that is, the operation is C += AB such
     that the product of AB is added to matrix C.
     """
-    for i in range(A.rows()):
-        for j in range(A.cols()):
-            for k in range(B.cols()):
+    n = A.rows()
+    for i in range(n):
+        for j in range(n):
+            for k in range(n):
                 C[i, j] += A[i, k] * B[k, j]
 
 
