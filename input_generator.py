@@ -16,12 +16,13 @@ import random
 
 random.seed(42)
 
-def generate_input(n_max):
+def generate_input(n_min=1, n_max=1, step=1):
     
     m = 2**53
-    ns = [2**i for i in range(1,n_max+1)]
+    ns = [2**i for i in range(n_min,n_max+1,step)]
     A = []
     B = []
+    
     for n in ns:
         x = int(math.sqrt(m/n))
         
@@ -34,6 +35,6 @@ def generate_input(n_max):
     return A, B
         
 if __name__ == '__main__':
-    A, B = generate_input(n_max=5)
-    print(A[4])
-    print(B[4])
+    A, B = generate_input(1,4,)
+    print(len(A))
+    print(len(B))
