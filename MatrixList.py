@@ -424,10 +424,10 @@ def strassen(A: Matrix, B: Matrix, m: int) -> Matrix:
 
 if __name__ == "__main__":
     n = 8
-    A = Matrix(n, n, [float(i) for i in range(n**2)])
-    B = Matrix(n, n, [float(i) for i in range(n**2)])
+    A = Matrix(n, n, [float(i) for i in range(1000, n**2, 1)])
+    B = Matrix(n, n, [float(i) for i in range(1000, n**2, 1)])
     D = Matrix(n, n, [0]*n**2)
-
+    
     C1 = elementary_multiplication(A, B)
     print("C1............")
     print(C1)

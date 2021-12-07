@@ -9,15 +9,13 @@ Created on Tue Dec  7 15:10:44 2021
 from typing import Callable, Any
 import time
 
-from MatrixList2 import Matrix, elementary_multiplication, recursive_multiplication_copying, recursive_multiplication_write_through, tiled_multiplication, strassen
+from MatrixList import Matrix, elementary_multiplication, recursive_multiplication_copying, recursive_multiplication_write_through, tiled_multiplication, strassen
 import numpy as np
 import math
 import random
 
-random.seed(42)
-
-def generate_input(n_min=1, n_max=1, step=1):
-    
+def generate_input(seed, n_min=1, n_max=1, step=1):
+    random.seed(seed)
     m = 2**53
     ns = [2**i for i in range(n_min,n_max+1,step)]
     A = []
@@ -34,7 +32,3 @@ def generate_input(n_min=1, n_max=1, step=1):
         
     return A, B
         
-if __name__ == '__main__':
-    A, B = generate_input(1,4,)
-    print(len(A))
-    print(len(B))
