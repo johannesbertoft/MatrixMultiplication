@@ -6,11 +6,7 @@ Created on Tue Dec  7 15:10:44 2021
 @author: danielestehghari
 """
 
-from typing import Callable, Any
-import time
-
-from MatrixList import Matrix, elementary_multiplication, recursive_multiplication_copying, recursive_multiplication_write_through, tiled_multiplication, strassen
-import numpy as np
+from MatrixList import Matrix
 import math
 import random
 
@@ -24,11 +20,10 @@ def generate_input(seed, n_min=1, n_max=1, step=1):
     for n in ns:
         x = int(math.sqrt(m/n))
         
-        A_floats = [float(i) for i in np.random.randint(-x, x, size=n**2)]
-        B_floats = [float(i) for i in np.random.randint(-x, x, size=n**2)]
-        
+        A_floats = [float(random.randint(-x, x)) for i in range(n**2)]
+        B_floats = [float(random.randint(-x, x)) for i in range(n**2)]
+        print(len(A_floats))
         A.append(Matrix(n,n,A_floats))
         B.append(Matrix(n,n,B_floats))
         
-    return A, B
-        
+    return ns, A, B

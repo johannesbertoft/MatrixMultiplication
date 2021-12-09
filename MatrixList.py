@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
+#from __future__ import annotations
 import math
 from typing import List, Union, Tuple, overload
 import sys
+from threading import Thread
 
 class Matrix:
     """
@@ -45,7 +46,7 @@ class Matrix:
         return self._cols
 
     @classmethod
-    def from_list(cls, data: List[List[float]]) -> Matrix:
+    def from_list(cls, data: List[List[float]]): #-> Matrix:
         """
         Construct a matrix from a list of lists
         """
@@ -65,12 +66,12 @@ class Matrix:
     def __getitem__(self, key: int) -> float: ...
 
     @overload
-    def __getitem__(self, key: Tuple[slice, slice]) -> Matrix: ...
+    def __getitem__(self, key: Tuple[slice, slice]): ... # -> Matrix: ...
 
     @overload
     def __getitem__(self, key: Tuple[int, int]) -> float: ...
 
-    def __getitem__(self, key: Union[int, Tuple[int, int], slice, Tuple[int, slice], Tuple[slice, int], Tuple[slice, slice]]) -> Union[float, Matrix]:
+    def __getitem__(self, key: Union[int, Tuple[int, int], slice, Tuple[int, slice], Tuple[slice, int], Tuple[slice, slice]]): # -> Union[float, Matrix]:
         """
         Implements the operator A[i,j] supporting also slices for submatrix
         access.
@@ -176,7 +177,7 @@ class Matrix:
             self._data[self._first_idx + i*self._stride + j] = float(value)
 
 
-    def __add__(self, that: Matrix) -> Matrix:
+    def __add__(self, that):#: Matrix) -> Matrix:
         """
         Regular addition of two matrices. Does not modify the operands.
         """
@@ -185,7 +186,7 @@ class Matrix:
             new_data.append(self[i] + that[i])
         return Matrix(self.rows(), self.cols(), new_data)
 
-    def __iadd__(self, that: Matrix) -> Matrix:
+    def __iadd__(self, that):#: Matrix) -> Matrix:
         """
         In-place addition of two matrices, modifies the left-hand side operand.
         """
@@ -193,7 +194,7 @@ class Matrix:
             self[i] += that[i]
         return self
 
-    def __sub__(self, that: Matrix) -> Matrix:
+    def __sub__(self, that):#: Matrix) -> Matrix:
         """
         Regular subtraction of two matrices. Does not modify the operands.
         """
@@ -202,7 +203,7 @@ class Matrix:
             new_data.append(self[i] - that[i])
         return Matrix(self.rows(), self.cols(), new_data)
 
-    def __isub__(self, that: Matrix) -> Matrix:
+    def __isub__(self, that):#: Matrix) -> Matrix:
         """
         Regular subtraction of two matrices. Does not modify the operands.
         """
@@ -420,43 +421,43 @@ def strassen(A: Matrix, B: Matrix, m: int) -> Matrix:
     C22 += M1 - M2 + M3 + M6
     return C
 
-
-
-if __name__ == "__main__":
-    n = 8
-    A = Matrix(n, n, [float(i) for i in range(1000, n**2, 1)])
-    B = Matrix(n, n, [float(i) for i in range(1000, n**2, 1)])
-    D = Matrix(n, n, [0]*n**2)
+def strassen_multithreaded(A, B, m: int):
+    a11, a12, a21, a22 = split(A) 
+    b11, b12, b21, b22 = split(B)
+    M: List[Matrix] = [None] * 7
+    threads = [None] * 7
+    P = [None] * 7
+    Q = [None] * 7
+    P[0] = a11+a22
+    Q[0] = b11+b22
+    P[1] = a21+a22
+    Q[1] = b11
+    P[2] = a11
+    Q[2] = b12-b22
+    P[3] = a22
+    Q[3] = b21-b11
+    P[4] = a11+a12
+    Q[4] = b22
+    P[5] = a21-a11
+    Q[5] = b11+b12
+    P[6] = a12-a22
+    Q[6] = b21+b22
     
-    C1 = elementary_multiplication(A, B)
-    print("C1............")
-    print(C1)
-    print("C2inplace............")
+    def thread_strassen(A, B, m, M, i):
+        M[i] = strassen(A, B, m)
+    
+    for i in range(len(threads)):
+        threads[i] = Thread(target=thread_strassen, args=(P[i], Q[i], m, M, i))
+        threads[i].start()
+    
+    for t in threads:
+        t.join()
 
-    elementary_multiplication_in_place(D, A, B)
-    print(D)
-    print("A............")
-    print(A)
-    print("B............")
-    print(B)
-    print("Ctiled............")
-    C3 = tiled_multiplication(A, B, 4)
-    print(C3)
-    print("Crecursive............")
-    C4 = recursive_multiplication_write_through(A, B, 0)
-    print(C4)
-    print("Crecursivecopy............")
-    C5 = recursive_multiplication_copying(A, B)
-    print(C5)
-    print("Cstrassen............")
-    C5 = strassen(A, B, 2)
-    print(C5)
-
-    print("B transposed............")
-    transpose(B)
-    print(B)
-    C6 = elementary_multiplication_transposed(A, B)
-    print("C6 transposed............")
-    print(C6)
-
+    C = Matrix(A.rows(), B.cols())
+    C11, C12, C21, C22 = split(C)
+    C11 += M[0] + M[3] - M[4] + M[6]
+    C12 += M[2] + M[4]
+    C21 += M[1] + M[3]
+    C22 += M[0] - M[1] + M[2] + M[5]
+    return C
 
