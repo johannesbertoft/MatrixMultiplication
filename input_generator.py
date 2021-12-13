@@ -22,7 +22,6 @@ def generate_input(seed, n_min=1, n_max=1, step=1):
         
         A_floats = [float(random.randint(-x, x)) for i in range(n**2)]
         B_floats = [float(random.randint(-x, x)) for i in range(n**2)]
-        print(len(A_floats))
         A.append(Matrix(n,n,A_floats))
         B.append(Matrix(n,n,B_floats))
         

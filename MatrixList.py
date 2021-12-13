@@ -5,6 +5,7 @@ import math
 from typing import List, Union, Tuple, overload
 import sys
 from threading import Thread
+from multiprocessing import Process, Pool
 
 class Matrix:
     """
@@ -183,7 +184,7 @@ class Matrix:
         """
         new_data = list()
         for i in range(self.rows()*self.cols()):
-            new_data.append(self[i] + that[i])
+            new_data.append(self._data[self._first_idx + (i//self._cols)*self._stride + i % self._cols] + that._data[that._first_idx + (i//that._cols)*that._stride + i % that._cols])
         return Matrix(self.rows(), self.cols(), new_data)
 
     def __iadd__(self, that):#: Matrix) -> Matrix:
@@ -191,7 +192,7 @@ class Matrix:
         In-place addition of two matrices, modifies the left-hand side operand.
         """
         for i in range(self.rows()*self.cols()):
-            self[i] += that[i]
+            self._data[self._first_idx + (i//self._cols)*self._stride + i % self._cols] += that._data[that._first_idx + (i//that._cols)*that._stride + i % that._cols]
         return self
 
     def __sub__(self, that):#: Matrix) -> Matrix:
@@ -200,7 +201,7 @@ class Matrix:
         """
         new_data = list()
         for i in range(self.rows()*self.cols()):
-            new_data.append(self[i] - that[i])
+            new_data.append(self._data[self._first_idx + (i//self._cols)*self._stride + i % self._cols] - that._data[that._first_idx + (i//that._cols)*that._stride + i % that._cols])
         return Matrix(self.rows(), self.cols(), new_data)
 
     def __isub__(self, that):#: Matrix) -> Matrix:
@@ -208,7 +209,7 @@ class Matrix:
         Regular subtraction of two matrices. Does not modify the operands.
         """
         for i in range(self.rows()*self.cols()):
-            self[i] -= that[i]
+            self._data[self._first_idx + (i//self._cols)*self._stride + i % self._cols] -= that._data[that._first_idx + (i//that._cols)*that._stride + i % that._cols]
         return self
 
 
@@ -352,8 +353,7 @@ def recursive_multiplication_copying(A: Matrix, B: Matrix) -> Matrix:
     """
     n = A.rows()
     if n <= 1:
-        Mi = Matrix(n, n, [A[0,0]*B[0,0]])
-        return Mi
+        return Matrix(n, n, [A[0]*B[0]])
     a00, a01, a10, a11 = split(A)
     b00, b01, b10, b11 = split(B)
     
@@ -366,7 +366,7 @@ def recursive_multiplication_copying(A: Matrix, B: Matrix) -> Matrix:
     M6 = recursive_multiplication_copying(a10, b01)
     M7 = recursive_multiplication_copying(a11, b11)
 
-    C = Matrix(A.rows(), B.cols(), [0]*(A.rows()*B.cols()))
+    C = Matrix(A.rows(), B.cols())
     C00, C01, C10, C11 = split(C)
     C00 += M0 + M1
     C01 += M2 + M3
@@ -425,7 +425,6 @@ def strassen_multithreaded(A, B, m: int):
     a11, a12, a21, a22 = split(A) 
     b11, b12, b21, b22 = split(B)
     M: List[Matrix] = [None] * 7
-    threads = [None] * 7
     P = [None] * 7
     Q = [None] * 7
     P[0] = a11+a22
@@ -442,22 +441,20 @@ def strassen_multithreaded(A, B, m: int):
     Q[5] = b11+b12
     P[6] = a12-a22
     Q[6] = b21+b22
-    
+    args = []
+    for i in range(7):
+        args.append((P[i], Q[i], m))
     def thread_strassen(A, B, m, M, i):
         M[i] = strassen(A, B, m)
-    
-    for i in range(len(threads)):
-        threads[i] = Thread(target=thread_strassen, args=(P[i], Q[i], m, M, i))
-        threads[i].start()
-    
-    for t in threads:
-        t.join()
-
+    pool = Pool(4)
+    M = pool.starmap(strassen, args)
+    pool.close()
     C = Matrix(A.rows(), B.cols())
     C11, C12, C21, C22 = split(C)
     C11 += M[0] + M[3] - M[4] + M[6]
     C12 += M[2] + M[4]
     C21 += M[1] + M[3]
     C22 += M[0] - M[1] + M[2] + M[5]
+    pool.join()
     return C
 
