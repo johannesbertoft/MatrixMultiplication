@@ -8,7 +8,7 @@ functions = {
 }
 
 params = [2**i for i in range(1, 12)]
-ns, A_lis, B_lis = generate_input(seed=2, n_min=5, n_max=6)
+ns, A_lis, B_lis = generate_input(seed=2, n_min=6, n_max=10)
 
 for func in functions.keys():
     n = [] 
@@ -18,7 +18,7 @@ for func in functions.keys():
     for i in range(len(A_lis)):
         lis = list(filter(lambda p: p < A_lis[i].rows(), params)) # Filters params to be the list of params smaller than n
         ns_ = [A_lis[i].rows()]*len(lis)
-        means, std = benchmark_optimal_param(func, A_lis[i], B_lis[i], 3, lis)
+        means, std = benchmark_optimal_param(func, A_lis[i], B_lis[i], 2, lis)
         n.extend(ns_)
         mean.extend(means)
         stdev.extend(std)
