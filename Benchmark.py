@@ -27,6 +27,7 @@ def measure(func: Callable[[], Any]):
     start = time.time()
     func()
     end = time.time()
+    #time.sleep(3)
     return end - start
 
 
@@ -57,7 +58,11 @@ def benchmark_runtime(f: FunType, args: Tuple[List[Matrix]], N: int, param = Non
             if param is None:
                 M[i].append(measure(lambda: f(A, B)))
             else:
-                M[i].append(measure(lambda: f(A, B, param))) 
+                if A.rows() <= param*2:
+                    print("parameter: ", A.rows()//2)
+                    M[i].append(measure(lambda: f(A, B, A.rows()//2)))
+                else:
+                    M[i].append(measure(lambda: f(A, B, param)))
         log_message(f, A.rows(), M[i][N-1])
     means = [st.mean(n) for n in M]
     stdevs = [st.stdev(n) for n in M]
@@ -70,12 +75,13 @@ def write_csv_optimal_parameter(ns, means, std, param, filename: str):
         for i in range(len(ns)):
             writer.writerow([ns[i], means[i], std[i], param[i]])
 
-def write_csv(ns, means, std, param, filename: str):
+def write_csv(ns, means, std, filename: str):
     with open(filename, 'w') as f:
         writer = csv.writer(f)
-        writer.writerow(["n", "Mean", "Standard Deviation", "param"])
+        writer.writerow(["n", "Mean", "Standard Deviation"])
         for i in range(len(ns)):
-            writer.writerow([ns[i], means[i], std[i], param[i]])
+            writer.writerow([ns[i], means[i], std[i]])
+    f.close()
 
 def log_message(f, n, last_run):
     print("Completed measurements for ", f)
@@ -97,13 +103,13 @@ def warm_up_cache(funcs, *args):
 # Test best s parameter
 
 all_functions = {
-    #elementary_multiplication: "Elementary_Multiplication",
+    elementary_multiplication: "Elementary_Multiplication",
     tiled_multiplication : "Tiled_Multiplication",
-    #recursive_multiplication_copying: "Recursive_Copying",
+    recursive_multiplication_copying: "Recursive_Copying",
     recursive_multiplication_write_through: "Recursive_Write_Through",
     strassen: "Strassen",
     strassen_multithreaded : "Strassen_Parallel",
-    #elementary_multiplication_transposed : "Elementary_Transposed"
+    elementary_multiplication_transposed : "Elementary_Transposed"
     }
 # for func in all_functions.keys():
 #     results = dict()

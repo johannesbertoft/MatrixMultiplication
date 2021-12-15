@@ -2,6 +2,7 @@
 
 #from __future__ import annotations
 import math
+import multiprocessing
 from typing import List, Union, Tuple, overload
 import sys
 from threading import Thread
@@ -444,17 +445,16 @@ def strassen_multithreaded(A, B, m: int):
     args = []
     for i in range(7):
         args.append((P[i], Q[i], m))
-    def thread_strassen(A, B, m, M, i):
-        M[i] = strassen(A, B, m)
-    pool = Pool(4)
-    M = pool.starmap(strassen, args)
+    with multiprocessing.Pool(4) as pool:
+        M = pool.starmap(strassen, args)
     pool.close()
+    pool.join()
     C = Matrix(A.rows(), B.cols())
     C11, C12, C21, C22 = split(C)
     C11 += M[0] + M[3] - M[4] + M[6]
     C12 += M[2] + M[4]
     C21 += M[1] + M[3]
     C22 += M[0] - M[1] + M[2] + M[5]
-    pool.join()
+    #pool.join()
     return C
 

@@ -7,8 +7,8 @@ functions = {
     strassen: "Strassen",
 }
 
-params = [2**i for i in range(1, 12)]
-ns, A_lis, B_lis = generate_input(seed=2, n_min=6, n_max=10)
+params = [2**i for i in range(7, 12)]
+ns, A_lis, B_lis = generate_input(seed=2, n_min=11, n_max=11)
 
 for func in functions.keys():
     n = [] 
@@ -24,5 +24,5 @@ for func in functions.keys():
         stdev.extend(std)
         m.extend(lis)
         print(m)
-    write_csv_optimal_parameter(n, mean, stdev, m, f"optimal_parameter/{functions[func]}_optimal_parameter.csv")
+    write_csv_optimal_parameter(n, mean, stdev, m, f"optimal_parameter/{functions[func]}_optimal_parameter_large.csv")
     
