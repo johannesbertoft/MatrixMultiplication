@@ -7,9 +7,9 @@ functions = {
     strassen: "Strassen",
 }
 
-params = [2**i for i in range(6, 7)]
+params = [2**i for i in range(1, 10)]
 
-ns, A_lis, B_lis = generate_input(seed=2, n_min=11, n_max=11)
+ns, A_lis, B_lis = generate_input(seed=2, n_min=1, n_max=11)
 
 for func in functions.keys():
     n = [] 
