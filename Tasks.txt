@@ -16,12 +16,12 @@ Elementary algorithm assuming one operand transposed, discuss cache model.
 
 Tiled implementation, 3 nested loops and call to Elementary
 
-# Task 5 - Incomplete
+# Task 5 - complete
 
 Decide on the best parameter s for Tiled. Fix n and discuss choice of n.
 Run experiments on s from 2 to n/2. Discuss results.
 
-# Task 6 - Incomplete
+# Task 6 - complete
 
 Repeat experiment from task 5 with different n
 
@@ -29,14 +29,14 @@ Repeat experiment from task 5 with different n
 
 # Task 8 Complete
 
-# Task 9 Incomplete
+# Task 9 complete
 
 Decide on the best parameter for fall back to elementary algorithm. Fix n to suitable value 
 discuss results
 
 # Task 10 Complete
 
-# Task 11 Incomplete
+# Task 11 complete
 
 Decide on best parameter for elementary algorithm, fix n, repeat with different n.
 
