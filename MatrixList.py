@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
-#from __future__ import annotations
+from __future__ import annotations
+
 import math
 import multiprocessing
-from typing import List, Union, Tuple, overload
 import sys
+from multiprocessing import Pool, Process
 from threading import Thread
-from multiprocessing import Process, Pool
+from typing import List, Optional, Tuple, Union, overload
+
+from typing_extensions import Self
+
 
 class Matrix:
     """
@@ -20,8 +24,9 @@ class Matrix:
     _stride: int
 
     def __init__(self, rows: int = 0, cols: int = 0,
-                 data: List[float] = None,
-                 row_length: int = None, first_idx: int = None):
+                 data: Optional[List[float]] = None,
+                 row_length: Optional[int] = None, 
+                 first_idx: Optional[int] = None):
         """
         Constructor for constructing a submatrix given the information of its
         shape and location in the supermatrix.
@@ -48,7 +53,7 @@ class Matrix:
         return self._cols
 
     @classmethod
-    def from_list(cls, data: List[List[float]]): #-> Matrix:
+    def from_list(cls, data: List[List[float]]) -> Matrix:
         """
         Construct a matrix from a list of lists
         """
@@ -68,12 +73,12 @@ class Matrix:
     def __getitem__(self, key: int) -> float: ...
 
     @overload
-    def __getitem__(self, key: Tuple[slice, slice]): ... # -> Matrix: ...
+    def __getitem__(self, key: Tuple[slice, slice]) -> Matrix: ...
 
     @overload
     def __getitem__(self, key: Tuple[int, int]) -> float: ...
 
-    def __getitem__(self, key: Union[int, Tuple[int, int], slice, Tuple[int, slice], Tuple[slice, int], Tuple[slice, slice]]): # -> Union[float, Matrix]:
+    def __getitem__(self, key: Union[int, Tuple[int, int], slice, Tuple[int, slice], Tuple[slice, int], Tuple[slice, slice]]) -> Union[float, Matrix]:
         """
         Implements the operator A[i,j] supporting also slices for submatrix
         access.
@@ -179,7 +184,7 @@ class Matrix:
             self._data[self._first_idx + i*self._stride + j] = float(value)
 
 
-    def __add__(self, that):#: Matrix) -> Matrix:
+    def __add__(self, that: Matrix) -> Matrix:
         """
         Regular addition of two matrices. Does not modify the operands.
         """
@@ -188,7 +193,7 @@ class Matrix:
             new_data.append(self._data[self._first_idx + (i//self._cols)*self._stride + i % self._cols] + that._data[that._first_idx + (i//that._cols)*that._stride + i % that._cols])
         return Matrix(self.rows(), self.cols(), new_data)
 
-    def __iadd__(self, that):#: Matrix) -> Matrix:
+    def __iadd__(self, that: Matrix) -> Matrix:
         """
         In-place addition of two matrices, modifies the left-hand side operand.
         """
@@ -196,7 +201,7 @@ class Matrix:
             self._data[self._first_idx + (i//self._cols)*self._stride + i % self._cols] += that._data[that._first_idx + (i//that._cols)*that._stride + i % that._cols]
         return self
 
-    def __sub__(self, that):#: Matrix) -> Matrix:
+    def __sub__(self, that: Matrix) -> Matrix:
         """
         Regular subtraction of two matrices. Does not modify the operands.
         """
@@ -214,7 +219,7 @@ class Matrix:
         return self
 
 
-def split(M: Matrix) ->Tuple[Matrix]:
+def split(M: Matrix):
     rows = M.rows()
     rowsd2 = rows//2
     return M[0:rowsd2, 0:rowsd2], M[0:rowsd2, rowsd2:rows], M[rowsd2:rows, 0:rowsd2], M[rowsd2:rows, rowsd2:rows]
@@ -224,7 +229,7 @@ def elementary_multiplication(A: Matrix, B: Matrix) -> Matrix:
     """
     Compute C = AB with three nested loops
     """
-    C = Matrix(A.rows(), B.cols(), [0]*(A.rows()*B.cols()))
+    C = Matrix(A.rows(), B.cols(), [0.]*(A.rows()*B.cols()))
     for i in range(A.rows()):
         for j in range(A.cols()):
             for k in range(B.cols()):
@@ -246,7 +251,7 @@ def elementary_multiplication_transposed(A: Matrix, B: Matrix) -> Matrix:
     """
     Compute C = AB with three nested loops, assuming transposed B
     """
-    C = Matrix(A.rows(), B.cols(), [0]*(A.rows()*B.cols()))
+    C = Matrix(A.rows(), B.cols(), [0.]*(A.rows()*B.cols()))
     for i in range(A.rows()):
         for j in range(A.cols()):
             for k in range(B.cols()):
@@ -258,7 +263,7 @@ def tiled_multiplication(A: Matrix, B: Matrix, s: int) -> Matrix:
     """
     Computes C=AB using (n/s)^3 multiplications of size s*s
     """
-    C = Matrix(A.rows(), B.cols(), [0]*(A.rows()*B.cols()))
+    C = Matrix(A.rows(), B.cols(), [0.]*(A.rows()*B.cols()))
     n: int = C.rows()
     ns: int = n//s
     for i in range(ns):
@@ -266,8 +271,7 @@ def tiled_multiplication(A: Matrix, B: Matrix, s: int) -> Matrix:
             for k in range(ns):
                 i_s, j_s, k_s = (i*s, j*s, k*s)
                 Cij = C[i_s:i_s+s, j_s:j_s+s]
-                Cij += elementary_multiplication(
-                    A[i_s:i_s+s, k_s:k_s+s], B[k_s:k_s+s, j_s:j_s+s])
+                Cij += elementary_multiplication(A[i_s:i_s+s, k_s:k_s+s], B[k_s:k_s+s, j_s:j_s+s])
     return C
 
 
@@ -296,7 +300,7 @@ def recursive_multiplication_write_through(A: Matrix, B: Matrix, m: int) -> Matr
     The parameter m controls such that when the subproblem size
     satisfies n <= m, * an iterative cubic algorithm is called instead.
     """
-    C = Matrix(A.rows(), B.cols(), [0]*(A.rows()*B.cols()))
+    C = Matrix(A.rows(), B.cols(), [0.]*(A.rows()*B.cols()))
 
     def mult_recursive(A, B, C):
         n = C.rows()
@@ -414,7 +418,7 @@ def strassen(A: Matrix, B: Matrix, m: int) -> Matrix:
     M6 = strassen(P6, Q6, m)
     M7 = strassen(P7, Q7, m)
 
-    C = Matrix(A.rows(), B.cols(), [0]*A.rows()*A.rows())
+    C = Matrix(A.rows(), B.cols(), [0.]*A.rows()*A.rows())
     C11, C12, C21, C22 = split(C)
     C11 += M1 + M4 - M5 + M7
     C12 += M3 + M5
@@ -425,23 +429,23 @@ def strassen(A: Matrix, B: Matrix, m: int) -> Matrix:
 def strassen_multithreaded(A, B, m: int):
     a11, a12, a21, a22 = split(A) 
     b11, b12, b21, b22 = split(B)
-    M: List[Matrix] = [None] * 7
-    P = [None] * 7
-    Q = [None] * 7
-    P[0] = a11+a22
-    Q[0] = b11+b22
-    P[1] = a21+a22
-    Q[1] = b11
-    P[2] = a11
-    Q[2] = b12-b22
-    P[3] = a22
-    Q[3] = b21-b11
-    P[4] = a11+a12
-    Q[4] = b22
-    P[5] = a21-a11
-    Q[5] = b11+b12
-    P[6] = a12-a22
-    Q[6] = b21+b22
+    M: List[Matrix]# = [None] * 7
+    P: List[Matrix] = list()
+    Q: List[Matrix] = list()
+    P.append(a11+a22)
+    Q.append(b11+b22)
+    P.append(a21+a22)
+    Q.append(b11)
+    P.append(a11)
+    Q.append(b12-b22)
+    P.append(a22)
+    Q.append(b21-b11)
+    P.append(a11+a12)
+    Q.append(b22)
+    P.append(a21-a11)
+    Q.append(b11+b12)
+    P.append(a12-a22)
+    Q.append(b21+b22)
     args = []
     for i in range(7):
         args.append((P[i], Q[i], m))
@@ -455,6 +459,6 @@ def strassen_multithreaded(A, B, m: int):
     C12 += M[2] + M[4]
     C21 += M[1] + M[3]
     C22 += M[0] - M[1] + M[2] + M[5]
-    #pool.join()
+
     return C
 

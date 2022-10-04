@@ -1,14 +1,21 @@
-from typing import Callable, Any, Optional, List, Tuple
-import time
-import statistics as st
-from MatrixList import Matrix, elementary_multiplication, elementary_multiplication_in_place, elementary_multiplication_transposed, recursive_multiplication_copying, recursive_multiplication_write_through, strassen_multithreaded, tiled_multiplication, strassen, transpose
-import csv
-import random
-from input_generator import generate_input
-import math
 import copy
+import csv
+import math
+import random
+import statistics as st
+import time
+from typing import Any, Callable, List, Optional, Tuple, Union
 
-FunType = Callable[[Matrix, Matrix], Matrix]
+from input_generator import generate_input
+from MatrixList import (Matrix, elementary_multiplication,
+                        elementary_multiplication_in_place,
+                        elementary_multiplication_transposed,
+                        recursive_multiplication_copying,
+                        recursive_multiplication_write_through, strassen,
+                        strassen_multithreaded, tiled_multiplication,
+                        transpose)
+
+FunType = Callable[..., Matrix]
 
 def generate_input(seed, n_min=1, n_max=1, step=1):
     random.seed(seed)
@@ -24,17 +31,17 @@ def generate_input(seed, n_min=1, n_max=1, step=1):
         B.append(Matrix(n,n,B_floats))
     return ns, A, B
 
-def measure(func: Callable[[], Any]):
+def measure(func: Callable[[], Any]) -> float:
     start = time.time()
     func()
     end = time.time()
     return end - start
 
 
-def benchmark_optimal_param(f: FunType, A: Matrix, B: Matrix, N: int, param: List[int]):
+def benchmark_optimal_param(f: FunType, A: Matrix, B: Matrix, N: int, param: List[int]) -> Tuple[List[float], List[float]]:
     print("Benchmarking optimal parameter...")
     m: int = len(param)
-    M: List[List[int]] = list()
+    M: List[List[float]] = list()
     for i in range(m):
         M.append([])
         for j in range(N): 
@@ -47,7 +54,7 @@ def benchmark_optimal_param(f: FunType, A: Matrix, B: Matrix, N: int, param: Lis
 def benchmark_transpose(f: FunType, B_lis: List[Matrix], N: int):
     print("Benchmarking transpose function parameter...")
     m: int = len(B_lis)
-    M: List[List[int]] = list()
+    M: List[List[float]] = list()
     for i in range(m):
         M.append([])
         B = B_lis[i]
@@ -59,10 +66,10 @@ def benchmark_transpose(f: FunType, B_lis: List[Matrix], N: int):
     stdevs =[st.stdev(n) for n in M]
     return means, stdevs 
 
-def benchmark_runtime(f: FunType, args: Tuple[List[Matrix]], N: int, param = None):
+def benchmark_runtime(f: FunType, args: Tuple[List[Matrix], List[Matrix]], N: int, param: Union[int, None] = None):
     print("Benchmarking...")
     m: int = len(args[0]) # The number of matrix pairs/triples to compute
-    M: List[List[int]] = list()
+    M: List[List[float]] = list()
     A_lis = args[0]
     B_lis = args[1]
     for i in range(m):
