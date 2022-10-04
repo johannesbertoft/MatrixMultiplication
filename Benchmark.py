@@ -6,7 +6,7 @@ import statistics as st
 import time
 from typing import Any, Callable, List, Optional, Tuple, Union
 
-from input_generator import generate_input
+from experiments_code.input_generator import generate_input
 from MatrixList import (Matrix, elementary_multiplication,
                         elementary_multiplication_in_place,
                         elementary_multiplication_transposed,
@@ -15,7 +15,7 @@ from MatrixList import (Matrix, elementary_multiplication,
                         strassen_multithreaded, tiled_multiplication,
                         transpose)
 
-FunType = Callable[..., Matrix]
+FunType = Callable[..., Optional[Matrix]]
 
 def generate_input(seed, n_min=1, n_max=1, step=1):
     random.seed(seed)

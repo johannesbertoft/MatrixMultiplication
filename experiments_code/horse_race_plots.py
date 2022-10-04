@@ -1,8 +1,8 @@
 import glob
 import os
+
 import pandas as pd
 from pandas.core import algorithms
-
 
 algorithms = [
     "Elementary_Multiplication",
@@ -27,7 +27,7 @@ for f in algorithms:
     dfs.append(df)
 
 result = pd.concat(dfs)
-result.index = result["Algorithm"]
+result.index = result["Algorithm"] #type: ignore
 result.drop("Algorithm", axis=1)
 result.to_csv("results.csv")
 

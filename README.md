@@ -2,6 +2,7 @@
 
 This repository contains implementations and benchmarking functions for the Matrix Multiplication Assignment.
 
+[Report](applied_algorithms_final_project_daniel_johannes.pdf)
 MatrixList.py contains the implementation of the row-major order, flat list Matrix implementation, 
 as well as different algorithms for Matrix Multiplication and auxiliary functions.
 
