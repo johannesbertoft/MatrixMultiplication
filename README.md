@@ -1,29 +1,22 @@
-# Matrix Multiplication Experiments
+# Matrix Multiplication Implementation and Report
 
-This repository contains implementations and benchmarking functions for the Matrix Multiplication Assignment.
+This project is the final assignment of the course Applied Algorithms in the MSc in Software Design at IT University of Copenhagen.
 
-[Report](applied_algorithms_final_project_daniel_johannes.pdf)
-MatrixList.py contains the implementation of the row-major order, flat list Matrix implementation, 
-as well as different algorithms for Matrix Multiplication and auxiliary functions.
+The repository contains implementations and benchmarking functions for various Matrix Multiplication techniques. 
 
-Experiments can be replicated by cloning the repository and running the following (requires PyPy 3.7):
+[MatrixList.py](MatrixList.py) contains an implementation of the row-major order, flat list Matrix implementation, 
+as well as different algorithms for Matrix Multiplication and auxiliary functions. [Benchmark.py](Benchmark.py) shows some of the utility functions used to benchmark the various matrix multiplication functions, and further experiments-related code can be found in [experiments_code](experiments_code).
 
-1) Benchmarking the Optimal Parameter 
+The [Report](applied_algorithms_final_project_daniel_johannes.pdf) describes the aim of the assignment and the
+analysis of results based on the Ideal Cache Model. 
 
-```
-pypy Optimal_Param.py
-```
-2) Benchmarking the transpose operation of a Matrix
+## What I learned?
 
-```
-pypy Measure_Transpose.py
-```
+*Implementing, testing and benchmarking algorithms for various input sizes and parameters
+*Understanding the Ideal Cache Model, analysing cache-aware and cache-oblivious algorithms
+*Algorithm analysis and tuning
 
-3) Benchmarking runtime all algorithms
 
-```
-pypy Horse_Race.py
-```
 
 
 
